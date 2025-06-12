@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Base directory containing the input files
-BASE_DIR="50/TOM/2025_06_09"
-OUTPUT_DIR="50/TOM/2025_06_09"
-LOG_FILE="50/TOM/2025_06_09/processing.log"
+BASE_DIR="50/AGA/2025_06_09"
+OUTPUT_DIR="50/AGA/2025_06_09"
+LOG_FILE="50/AGA/2025_06_09/processing.log"
 
 # Database connection parameters
 DB_HOST="localhost"
@@ -127,6 +127,8 @@ while IFS= read -r json_file; do
             --replace-ids \
             --id-prefix "$id_prefix" > /dev/null 2>&1
         
+        python bbox.py "$output_file" --no-backup > /dev/null 2>&1
+
         export_status=$?
         
         if [ $export_status -eq 0 ]; then
