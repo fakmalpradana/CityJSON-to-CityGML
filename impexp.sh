@@ -1,26 +1,44 @@
-/Applications/3DCityDB-Importer-Exporter/bin/impexp \
+#!/bin/bash
+
+# Base directory containing the input files
+json_file="file.json"
+output_file="file.gml"
+LOG_FILE="file.log"
+
+# Database connection parameters
+DB_HOST="localhost"
+DB_PORT="5432"
+DB_NAME="dkj"
+DB_SCHEMA="citydb"
+DB_USER="postgres"
+DB_PASS="admin1234"
+IMPEXP_PATH="/Applications/3DCityDB-Importer-Exporter/bin/impexp"
+
+$IMPEXP_PATH \
     import \
     -T postgresql \
-    -H localhost \
-    -P 5432 \
-    -d dkj \
-    -S citydb \
-    -u postgres \
-    -p admin1234 \
-    50/AH_03/AH_03_B/AH_03_B.json \
+    -H $DB_HOST \
+    -P $DB_PORT \
+    -d $DB_NAME \
+    -S $DB_SCHEMA \
+    -u $DB_USER \
+    -p $DB_PASS \
+    "$json_file" 
 
-/Applications/3DCityDB-Importer-Exporter/bin/impexp \
+$IMPEXP_PATH \
     export \
     -T postgresql \
-    -H localhost \
-    -P 5432 \
-    -d dkj \
-    -S citydb \
-    -u postgres \
-    -p admin1234 \
-    -o 50/CityGML/AH_30_B.gml \
+    -H $DB_HOST \
+    -P $DB_PORT \
+    -d $DB_NAME \
+    -S $DB_SCHEMA \
+    -u $DB_USER \
+    -p $DB_PASS \
+    -o "$output_file" \
     --compressed-format citygml \
     --replace-ids \
-    --id-prefix AH_30_B_
+    --id-prefix "$id_prefix"
+
+python bbox.py "$output_file" --no-backup
 
 sh resetdb.sh
