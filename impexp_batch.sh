@@ -1,18 +1,23 @@
 #!/bin/bash
 
 # Base directory containing the input files
-BASE_DIR="50/AGA/2025_06_09"
-OUTPUT_DIR="50/AGA/2025_06_09"
-LOG_FILE="50/AGA/2025_06_09/processing.log"
+BASE_DIR=${BASE_DIR}
+OUTPUT_DIR=${OUTPUT_DIR}
+LOG_FILE=${LOG_FILE}
 
 # Database connection parameters
-DB_HOST="localhost"
-DB_PORT="5432"
-DB_NAME="dkj"
-DB_SCHEMA="citydb"
-DB_USER="postgres"
-DB_PASS="admin1234"
-IMPEXP_PATH="/Applications/3DCityDB-Importer-Exporter/bin/impexp"
+DB_HOST=${DB_HOST}
+DB_PORT=${DB_PORT}
+DB_NAME=${DB_NAME}
+DB_SCHEMA=${DB_SCHEMA}
+DB_USER=${DB_USER}
+DB_PASS=${DB_PASS}
+IMPEXP_PATH=${IMPEXP_PATH}
+BBOXPY_PATH=${BBOXPY_PATH:-/app/converter-json2gml/bbox.py}
+RESETDB_PATH=${RESETDB_PATH:-/app/converter-json2gml/resetdb.sh}
+
+# Export password untuk psql dan pg_restore
+export PGPASSWORD=${DB_PASS}
 
 # Create output directory if it doesn't exist
 mkdir -p "$OUTPUT_DIR"
@@ -49,7 +54,7 @@ echo "🔍 Scanning for JSON files..."
 
 # Create temporary file to store file list
 temp_file=$(mktemp)
-find "$BASE_DIR" -name "*.json" -type f > "$temp_file" 2>/dev/null
+find "$BASE_DIR" -name "*.json" -type f > "$temp_file" 2> /dev/null
 
 # Count files
 total_files=$(wc -l < "$temp_file" | tr -d ' ')
@@ -125,9 +130,9 @@ while IFS= read -r json_file; do
             -o "$output_file" \
             --compressed-format citygml \
             --replace-ids \
-            --id-prefix "$id_prefix" > /dev/null 2>&1
+            --id-prefix "$id_prefix" >> /dev/null 2>&1
         
-        python bbox.py "$output_file" --no-backup > /dev/null 2>&1
+        python "$BBOXPY_PATH" "$output_file" --no-backup >> /dev/null 2>&1
 
         export_status=$?
         
@@ -149,7 +154,7 @@ while IFS= read -r json_file; do
     show_progress $current_file $total_files "$filename" "Resetting DB"
     
     # Reset database after each iteration
-    sh resetdb.sh > /dev/null 2>&1
+    sh "$RESETDB_PATH" > /dev/null 2>&1
     log_message "Database reset completed for $filename"
     
 done < "$temp_file"
