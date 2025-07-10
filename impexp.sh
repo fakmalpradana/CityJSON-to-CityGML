@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Base directory containing the input files
-BASE_DIR=${BASE_DIR}
-OUTPUT_DIR=${OUTPUT_DIR}
-LOG_FILE=${LOG_FILE}
+BASE_DIR=${JSON2GML_INPUT_DIR}
+OUTPUT_DIR=${JSON2GML_OUTPUT_DIR}
+LOG_FILE=${JSON2GML_LOG_DIR}/processing.log
 
 # Database connection parameters
 DB_HOST=${DB_HOST}
