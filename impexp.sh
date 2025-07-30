@@ -1,18 +1,23 @@
 #!/bin/bash
 
 # Base directory containing the input files
-json_file="file.json"
-output_file="file.gml"
-LOG_FILE="file.log"
+BASE_DIR=${JSON2GML_INPUT_DIR}
+OUTPUT_DIR=${JSON2GML_OUTPUT_DIR}
+LOG_FILE=${JSON2GML_LOG_DIR}/processing.log
 
 # Database connection parameters
-DB_HOST="localhost"
-DB_PORT="5432"
-DB_NAME="dkj"
-DB_SCHEMA="citydb"
-DB_USER="postgres"
-DB_PASS="admin1234"
-IMPEXP_PATH="/Applications/3DCityDB-Importer-Exporter/bin/impexp"
+DB_HOST=${DB_HOST}
+DB_PORT=${DB_PORT}
+DB_NAME=${DB_NAME}
+DB_SCHEMA=${DB_SCHEMA}
+DB_USER=${DB_USER}
+DB_PASS=${DB_PASS}
+IMPEXP_PATH=${IMPEXP_PATH}
+BBOXPY_PATH=${BBOXPY_PATH:-/app/converter-json2gml/bbox.py}
+RESETDB_PATH=${RESETDB_PATH:-/app/converter-json2gml/resetdb.sh}
+
+# Export password untuk psql dan pg_restore
+export PGPASSWORD=${DB_PASS}
 
 $IMPEXP_PATH \
     import \
@@ -39,6 +44,6 @@ $IMPEXP_PATH \
     --replace-ids \
     --id-prefix "$id_prefix"
 
-python bbox.py "$output_file" --no-backup
+python "$BBOXPY_PATH" "$output_file" --no-backup
 
-sh resetdb.sh
+sh "$RESETDB_PATH"
