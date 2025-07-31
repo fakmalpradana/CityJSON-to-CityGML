@@ -16,7 +16,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "📦 Melakukan restore dari file backup (.dump)..."
-pg_restore -U "$DB_USER" -h "$DB_HOST" -d "$DB_NAME" -c "$BACKUP_FILE"
+pg_restore -U "$DB_USER" -h "$DB_HOST" -d "$DB_NAME" -c --no-owner --role="$DB_USER" "$BACKUP_FILE"
 if [ $? -ne 0 ]; then
     echo "❌ Restore gagal. Silakan periksa kembali file backup atau koneksi database."
     exit 1
